@@ -28,6 +28,13 @@
 		this._videos = {};
 
 		/**
+		 * YouTube url parameters
+		 * @protected
+		 * @type {Object}
+		 */
+		this._urlParameters = {};
+
+		/**
 		 * Current playing item.
 		 * @protected
 		 * @type {jQuery}
@@ -134,6 +141,9 @@
 			id = url.match(/(http:|https:|)\/\/(player.|www.|app.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com)|vzaar\.com)\/(video\/|videos\/|embed\/|channels\/.+\/|groups\/.+\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
 
 			if (id[3].indexOf('youtu') > -1) {
+				var splittedUrl = url.split(/\?/);
+				this._urlParameters[url] = splittedUrl[1] ? splittedUrl[1] : null;
+
 				type = 'youtube';
 			} else if (id[3].indexOf('vimeo') > -1) {
 				type = 'vimeo';
@@ -203,7 +213,7 @@
 		}
 
 		if (video.type === 'youtube') {
-			path = "//img.youtube.com/vi/" + video.id + "/hqdefault.jpg";
+			path = "//img.youtube.com/vi/" + video.id + "/maxresdefault.jpg";
 			create(path);
 		} else if (video.type === 'vimeo') {
 			$.ajax({
@@ -252,6 +262,7 @@
 		var target = $(event.target),
 			item = target.closest('.' + this._core.settings.itemClass),
 			video = this._videos[item.attr('data-video')],
+			params = this._urlParameters[item.attr('data-video')],
 			width = video.width || '100%',
 			height = video.height || this._core.$stage.height(),
 			html;
@@ -268,8 +279,13 @@
 		this._core.reset(item.index());
 
 		if (video.type === 'youtube') {
-			html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' +
-				video.id + '?autoplay=1&rel=0&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
+			if (params) {
+				html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' +
+					video.id + '?autoplay=1&rel=0&v=' + video.id + '&' + params + '" frameborder="0" allowfullscreen></iframe>';
+			} else {
+				html = '<iframe width="' + width + '" height="' + height + '" src="//www.youtube.com/embed/' +
+					video.id + '?autoplay=1&rel=0&v=' + video.id + '" frameborder="0" allowfullscreen></iframe>';
+			}
 		} else if (video.type === 'vimeo') {
 			html = '<iframe src="//player.vimeo.com/video/' + video.id +
 				'?autoplay=1" width="' + width + '" height="' + height +
