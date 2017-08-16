@@ -110,7 +110,8 @@
 	 * @param {jQuery} item - The item containing the video.
 	 */
 	Video.prototype.fetch = function(target, item) {
-			var type = (function() {
+			var splittedUrl,
+				type = (function() {
 					if (target.attr('data-vimeo-id')) {
 						return 'vimeo';
 					} else if (target.attr('data-vzaar-id')) {
@@ -141,7 +142,7 @@
 			id = url.match(/(http:|https:|)\/\/(player.|www.|app.)?(vimeo\.com|youtu(be\.com|\.be|be\.googleapis\.com)|vzaar\.com)\/(video\/|videos\/|embed\/|channels\/.+\/|groups\/.+\/|watch\?v=|v\/)?([A-Za-z0-9._%-]*)(\&\S+)?/);
 
 			if (id[3].indexOf('youtu') > -1) {
-				var splittedUrl = url.split(/\?/);
+				splittedUrl = url.split(/\?/);
 				this._urlParameters[url] = splittedUrl[1] ? splittedUrl[1] : null;
 
 				type = 'youtube';
